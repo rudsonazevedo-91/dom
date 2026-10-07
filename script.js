@@ -56,6 +56,7 @@ function renderizarTarefas() {
         }
 
         const colunaAçoes = document.createElement("td");
+        colunaAçoes.classList.add("text-center");
 
         const botaoConcluir = document.createElement("button");
         botaoConcluir.textContent = 
@@ -77,9 +78,38 @@ function renderizarTarefas() {
         });
 
         const botaoEditar = document.createElement("button");
+        botaoEditar.textContent = "Editar";
+        botaoEditar.classList.add(
+            "btn", 
+            "btn-primary", 
+            "btn-sm", 
+            "me-2"
+        );
+        botaoEditar.addEventListener(
+            "click",
+            function() {
+                // Lógica para editar tarefa
+                editarTarefa(tarefa.id);
+            }
+        );
         const botaoExcluir = document.createElement("button");
+        botaoExcluir.textContent = "Excluir";
+        botaoExcluir.classList.add(
+            "btn", 
+            "btn-danger", 
+            "btn-sm"
+        );
+        botaoExcluir.addEventListener(
+            "click",
+            function() {
+                // Lógica para excluir tarefa
+                excluirTarefa(tarefa.id);
+            }
+        );
 
         colunaAçoes.appendChild(botaoConcluir);
+        colunaAçoes.appendChild(botaoEditar);
+        colunaAçoes.appendChild(botaoExcluir);
 
         linha.appendChild(colunaNumero);
         linha.appendChild(colunaNome);
@@ -88,6 +118,11 @@ function renderizarTarefas() {
 
         listaTarefas.appendChild(linha);
     });
+    atualizarContador();
+}
+
+function salvarTarefa() {
+    localStorage.setItem("tarefas", JSON.stringify(tarefas));
 }
 
 function alterarStatus(id) {
@@ -100,8 +135,47 @@ function alterarStatus(id) {
     renderizarTarefas();
 }
 
-function salvarTarefa() {
-    localStorage.setItem("tarefas", JSON.stringify(tarefas));
+function atualizarContador() {
+    const quantidade = tarefas.length;
+    if (quantidade === 1) {
+        contador.textContent = "Nenhuma tarefa cadastrada.";
+    } else if (quantidade === 1) {
+        contador.textContent = "1 tarefa cadastrada.";
+    } else {
+        contador.textContent = `${quantidade} tarefas cadastradas.`;
+    }
+
 }
 
+function editarTarefa(id) {
+    const tarefa = tarefas.find(function (tarefa) {
+        return tarefa.id === id;
+    });
+    const novoTexto = prompt("Edite a nova tarefa:", tarefa.texto).trim();
+    if (novoTexto === "") {
+        alert("A tarefa não pode ficar vazia!");
+        return; 
+    }
+    tarefa.texto = novoTexto;
+    salvarTarefa();
+    renderizarTarefas();
+
+}
+
+function excluirTarefa(id) {
+    const confirmar = confirm("Tem certeza que deseja excluir esta tarefa?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    const indice = tarefas.findIndex(function (tarefa) {
+        return tarefa.id === id;
+    });
+
+    tarefas.splice(indice, 1);
+
+    salvarTarefa();
+    renderizarTarefas();
+}
 renderizarTarefas();
